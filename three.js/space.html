@@ -1,0 +1,183 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <title>three.js particle tutorial</title>
+    <meta charset="utf-8">
+
+    <style type="text/css">
+        body {
+            background: black;
+            margin: 0px;
+            overflow: hidden;
+        }
+    </style>
+
+</head>
+
+<body>
+    <script src="./js/three.js"></script>
+
+	<script type="text/javascript" src="./js/TrackballControls.js"></script>
+    <script defer="defer">
+        var renderer = new  THREE.WebGLRenderer();
+		renderer.shadowMapEnabled = true;
+		var windowHalfX = window.innerWidth / 2;
+		var windowHalfY = window.innerHeight / 2;
+        var scene = new THREE.Scene();
+        var camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 1, 1000);
+		var controls = new THREE.TrackballControls(camera);
+		
+        var backgroundScene = new THREE.Scene();
+        var backgroundCamera = new THREE.Camera();
+        init();
+		background();
+
+        function init() { // renderer
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            // camera
+            camera.position.y = -250;
+            camera.position.z = 400;
+			controls.addEventListener('change',render);
+			controls.rotateSpeed = .1;
+			controls.zoomSpeed = .7;
+			controls.panSpeed = 0.1;
+
+
+            var loader = new THREE.JSONLoader();
+            loader.load('./models/world.json', callBackMesh);
+            loader.load('./models/world.json', callBackMars);
+            loader.load('./models/world.json', callBackSun);
+
+			light();
+			renderer.render(scene, camera);
+			
+
+            document.addEventListener('mousemove', onMouseMove, false);
+            // start animation
+            // animate();
+            setInterval(update, 1000 / 30);
+        }
+
+		function background(){
+		// Load the background texture
+        var texture = THREE.ImageUtils.loadTexture( './textures/space1.png' );
+        var backgroundMesh = new THREE.Mesh(
+            new THREE.PlaneGeometry(2, 2, 0),
+            new THREE.MeshBasicMaterial({
+                map: texture
+            }));
+
+        backgroundMesh .material.depthTest = false;
+        backgroundMesh .material.depthWrite = false;
+
+        // Create your background scene
+        backgroundScene.add(backgroundCamera );
+        backgroundScene.add(backgroundMesh );
+		renderer.render(backgroundScene , backgroundCamera );
+		}
+
+        function callBackMesh(geometry, materials) {
+
+            imagen = new THREE.ImageUtils.loadTexture('./textures/worldReal.jpg');
+            material = new THREE.MeshLambertMaterial({
+                map: imagen
+            });
+            var mesh = new THREE.Mesh(geometry, material);
+            mesh.scale.set(10, 10, 5);
+            mesh.position.set(0, -250, 300);
+            scene.add(mesh);
+        };
+
+        function callBackMars(geometry, materials) {
+
+            imagen = new THREE.ImageUtils.loadTexture('./textures/mars.jpg');
+            material = new THREE.MeshLambertMaterial({
+                map: imagen
+            });
+            var mesh = new THREE.Mesh(geometry, material);
+			mesh.rotation.y=Math.PI; 
+            mesh.scale.set(10, 10, 5);
+            mesh.position.set(100, -250, 350);
+            scene.add(mesh);
+        };
+
+        function callBackSun(geometry, materials) {
+
+            imagen = new THREE.ImageUtils.loadTexture('./textures/sun.jpg');
+            material = new THREE.MeshLambertMaterial({
+                map: imagen
+            });
+            var mesh = new THREE.Mesh(geometry, material);
+            mesh.scale.set(10, 10, 5);
+            mesh.position.set(-100, -250, 350);
+
+			mesh.rotation.y=Math.PI; 
+            scene.add(mesh);
+        };
+
+        function callBackSpace(geometry, materials) {
+
+            imagen = new THREE.ImageUtils.loadTexture('./textures/space1.png');
+            material = new THREE.MeshLambertMaterial({
+                map: imagen
+            });
+            var mesh = new THREE.Mesh(geometry, material);
+            mesh.scale.set(windowHalfX, windowHalfY, 100);
+            mesh.position.set(-100, -250, 400);
+
+			mesh.rotation.y=Math.PI; 
+            scene.add(mesh);
+        };
+
+        function onMouseMove(event) {
+			mouseX = event.clientX - windowHalfX;
+            mouseY = event.clientY - windowHalfY;
+        }
+
+        function update() {
+
+		/*	camera.position.x += ( mouseX - camera.position.x ) * 0.02;
+			camera.position.y += ( - mouseY - camera.position.y ) * 0.02;
+		*/
+			
+			controls.update();
+        }
+
+		function render(){
+			renderer.autoClear = false;
+            renderer.clear();
+            renderer.render(backgroundScene , backgroundCamera );
+            renderer.render(scene, camera);
+		}
+
+		function light(){
+			var lux = new THREE.PointLight(0xffffff);
+			lux.position.set(-100, -250, 350);
+			scene.add(lux);
+			
+			var ambientLight = new THREE.AmbientLight(0x000000);
+			scene.add(ambientLight);
+			
+			var sunlight = new THREE.DirectionalLight();
+	
+			sunlight.position.set(-100, -250, 350);
+			sunlight.intensity = 1.3;
+			sunlight.castShadow = true;
+			sunlight.ShadowCameraVisible = true;
+			sunlight.shadowCameraNear = 250;
+			sunlight.shadowCameraFar = 20000;
+			sunlight.ShadowCameraLeft = -200;
+			sunlight.shadowCameraRight = 200;
+			sunlight.shadowCameraTop = 200;
+			sunlight.shadowCameraBottom = -200;
+			
+			scene.add(sunlight);
+		}
+    </script>
+
+</body>
+
+</html>
