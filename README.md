@@ -1,5 +1,4 @@
 # Three.js Examples
-========
 
 ### Night
 Testing textures and light
@@ -8,3 +7,9 @@ Testing textures and light
 ### Space
 Testing textures and object movements
 ![space](https://raw.githubusercontent.com/gre3nlion/threeJS-examples/master/images/space.png)
+
+### Run proyect
+```
+install http-server -g
+http-server
+```
